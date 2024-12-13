@@ -56,7 +56,7 @@ def draw_pieces():
                 pygame.draw.circle(screen, GOLD, (col * SQUARE_SIZE + SQUARE_SIZE // 2, row * SQUARE_SIZE + SQUARE_SIZE // 2), radius, 2)
             elif piece == "WHITE":  # Reina blanca
                 pygame.draw.circle(screen, WHITE, (col * SQUARE_SIZE + SQUARE_SIZE // 2, row * SQUARE_SIZE + SQUARE_SIZE // 2), radius)
-                
+                pygame.draw.circle(screen, GOLD, (col * SQUARE_SIZE + SQUARE_SIZE // 2, row * SQUARE_SIZE + SQUARE_SIZE // 2), radius, 2)
                 
 def get_square_under_mouse():
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -87,14 +87,14 @@ def is_valid_capture(piece_row, piece_col, target_row, target_col):
         middle_col = (piece_col + target_col) // 2 
         if is_within_bounds(middle_row, middle_col) and is_within_bounds(target_row, target_col): 
             # Verificar si la pieza en el medio está en el borde 
-            if is_at_edge(middle_row, middle_col) or is_at_edge(target_row, target_col):
+            if  is_at_edge(target_row, target_col):
                 return False 
             return (board[middle_row][middle_col] is not None and 
                     board[middle_row][middle_col].lower() != board[piece_row][piece_col].lower()) 
     return False
 
 def is_at_edge(row, col):
-    return row == 0 or row == ROWS  or col == 0 or col == COLS
+    return row == 0 or row == ROWS-1  or col == 0 or col == COLS-1
 
 
 def get_piece_moves(piece_row, piece_col):
@@ -130,6 +130,7 @@ def get_piece_moves(piece_row, piece_col):
             if not is_at_edge(capture_row, capture_col): 
                 capture_moves.append(((piece_row, piece_col), (capture_row,capture_col)))
 
+    print(capture_moves)
     return moves, capture_moves
 
 def is_valid_move(piece_row, piece_col, target_row, target_col, capture=True):
