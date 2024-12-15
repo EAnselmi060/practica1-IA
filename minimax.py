@@ -77,25 +77,34 @@ def get_all_valid_moves(player):
                 new_moves, new_capture_moves = get_piece_moves(row, col)
                 moves.extend(new_moves)
                 capture_moves.extend(new_capture_moves)
-
+                
+    
     return capture_moves if capture_moves else moves
 
-
 def is_valid_capture(piece_row, piece_col, target_row, target_col):
-    if abs(target_row - piece_row) == 2: 
-        middle_row = (piece_row + target_row) // 2 
-        middle_col = (piece_col + target_col) // 2 
-        if is_within_bounds(middle_row, middle_col) and is_within_bounds(target_row, target_col): 
-            # Verificar si la pieza en el medio está en el borde 
-            if  is_at_edge(target_row, target_col):
-                return False 
-            return (board[middle_row][middle_col] is not None and 
-                    board[middle_row][middle_col].lower() != board[piece_row][piece_col].lower()) 
+    
+    if abs(target_row - piece_row) == 2:  # Movimiento de captura donde se dirige - donde esta actualmente
+        middle_row = (piece_row + target_row) // 2
+        middle_col = (piece_col + target_col) // 2
+
+        if is_within_bounds(middle_row, middle_col) and is_within_bounds(target_row, target_col):
+            # Verificar si la pieza en el medio o el objetivo está en el borde
+            #if is_at_edge(middle_row, middle_col): #or is_at_edge(target_row, target_col):
+            #    return False
+            
+            # Verificar que la casilla donde caerá la ficha esté vacía
+            if board[target_row][target_col] is not None:
+                return False
+
+
+            return (
+                board[middle_row][middle_col] is not None
+                and board[middle_row][middle_col].lower() != board[piece_row][piece_col].lower()
+            )
     return False
 
 def is_at_edge(row, col):
-    return row == 0 or row == ROWS-1  or col == 0 or col == COLS-1
-
+    return row == 0 or row == ROWS - 1 or col == 0 or col == COLS - 1
 
 def get_piece_moves(piece_row, piece_col):
     moves = []
@@ -109,7 +118,7 @@ def get_piece_moves(piece_row, piece_col):
         directions = [(-1, 1), (-1, -1)]  # Sólo moverse hacia arriba
     elif piece.lower() == "black":
         directions = [(1, 1), (1, -1)]  # Sólo moverse hacia abajo
-    
+
     # Permitir movimientos en ambas direcciones para reinas
     if piece == "WHITE" or piece == "BLACK":
         directions = [
@@ -124,13 +133,16 @@ def get_piece_moves(piece_row, piece_col):
             moves.append(((piece_row, piece_col), (target_row, target_col)))
 
         # Movimiento de captura (dos casillas en la dirección, debe capturar una pieza)
-        capture_row, capture_col = piece_row + 2*dr, piece_col + 2*dc
+        capture_row, capture_col = piece_row + 2 * dr, piece_col + 2 * dc
         if is_valid_capture(piece_row, piece_col, capture_row, capture_col):
-            # Verificar si la captura lleva la pieza al borde del tablero 
-            if not is_at_edge(capture_row, capture_col): 
-                capture_moves.append(((piece_row, piece_col), (capture_row,capture_col)))
+            # Verificar si la captura lleva la pieza al borde del tablero
+            #if not is_at_edge(capture_row, capture_col):
+            capture_moves.append(((piece_row, piece_col), (capture_row, capture_col)))
 
+    print("--movimientos de captura---")
     print(capture_moves)
+    
+        
     return moves, capture_moves
 
 def is_valid_move(piece_row, piece_col, target_row, target_col, capture=True):
@@ -152,12 +164,14 @@ def is_valid_move(piece_row, piece_col, target_row, target_col, capture=True):
     if capture and abs(target_row - piece_row) == 2 and abs(target_col - piece_col) == 2:
         middle_row = (piece_row + target_row) // 2
         middle_col = (piece_col + target_col) // 2
-        if is_within_bounds(middle_row, middle_col) and board[middle_row][middle_col] is not None and board[middle_row][middle_col].lower() != piece.lower():
+        if (
+            is_within_bounds(middle_row, middle_col)
+            and board[middle_row][middle_col] is not None
+            and board[middle_row][middle_col].lower() != piece.lower()
+        ):
             return True
 
     return False
-
-
 
 def make_move(piece_row, piece_col, target_row, target_col):
     global moves_without_capture
@@ -208,12 +222,6 @@ def is_terminal(): #funcion fin del juego
 
     return False, None
 
-'''
-def heuristic():    #define en que situación esta, estados intermedios
-    white_pieces = sum(cell == "white" or cell == "WHITE" for row in board for cell in row)
-    black_pieces = sum(cell == "black" or cell == "BLACK" for row in board for cell in row)
-    return black_pieces - white_pieces
-'''
 def heuristic():
     white_pieces = sum(cell == "white" or cell == "WHITE" for row in board for cell in row)
     black_pieces = sum(cell == "black" or cell == "BLACK" for row in board for cell in row)
@@ -238,6 +246,7 @@ def minimax(depth, alpha, beta, maximizing):
     best_move = None
     if maximizing:
         max_eval = -math.inf
+        print("--movimientos black--")
         for move in get_all_valid_moves("black"):
             temp_board = copy.deepcopy(board)
             make_move(*move[0], *move[1])
@@ -253,6 +262,7 @@ def minimax(depth, alpha, beta, maximizing):
         return max_eval, best_move
     else:
         min_eval = math.inf
+        print("--movimientos white--")
         for move in get_all_valid_moves("white"):
             temp_board = copy.deepcopy(board)
             make_move(*move[0], *move[1])
@@ -268,7 +278,7 @@ def minimax(depth, alpha, beta, maximizing):
         return min_eval, best_move
 
 def agent_move():
-    _, best_move = minimax(3, -math.inf, math.inf, True)
+    _, best_move = minimax(5, -math.inf, math.inf, True)
     if best_move:
         piece_row, piece_col = best_move[0]
         target_row, target_col = best_move[1]
