@@ -139,8 +139,8 @@ def get_piece_moves(piece_row, piece_col):
             #if not is_at_edge(capture_row, capture_col):
             capture_moves.append(((piece_row, piece_col), (capture_row, capture_col)))
 
-    print("--movimientos de captura---")
-    print(capture_moves)
+    #print("--movimientos de captura---")
+    #print(capture_moves)
     
         
     return moves, capture_moves
@@ -157,6 +157,9 @@ def is_valid_move(piece_row, piece_col, target_row, target_col, capture=True):
 
     # Movimiento diagonal básico
     if abs(target_row - piece_row) == 1 and abs(target_col - piece_col) == 1:
+        if piece == "white" and target_row > piece_row:
+            return False
+        
         if board[target_row][target_col] is None:
             return True
 
@@ -252,6 +255,9 @@ def minimax(depth, alpha, beta, maximizing):
             make_move(*move[0], *move[1])
             eval, _ = minimax(depth - 1, alpha, beta, False)
             board[:] = temp_board
+            
+            print("--evaluacion--")
+            print(f"{move},{eval}")
 
             if eval > max_eval:
                 max_eval = eval
@@ -259,6 +265,8 @@ def minimax(depth, alpha, beta, maximizing):
             alpha = max(alpha, eval)
             if beta <= alpha:   #condicion de poda
                 break
+            
+        
         return max_eval, best_move
     else:
         min_eval = math.inf
@@ -280,6 +288,9 @@ def minimax(depth, alpha, beta, maximizing):
 def agent_move():
     _, best_move = minimax(5, -math.inf, math.inf, True)
     if best_move:
+        print("--best de movimientos---")
+        print(best_move)
+        
         piece_row, piece_col = best_move[0]
         target_row, target_col = best_move[1]
         animate_move(piece_row, piece_col, target_row, target_col)
