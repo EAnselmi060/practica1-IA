@@ -9,3 +9,5 @@ Agente basado en conocimiento - Agente que juega DAMAS de manera autonoma contra
 - random
 
 ¡Uso del  pipinstaller para la creacion del ejecutable!
+
+Nota: en caso de no tener el archivo .pkl se debe ejecutar 2 veces al agente 
