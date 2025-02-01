@@ -4,7 +4,8 @@ Agente basado en conocimiento - Agente que juega DAMAS de manera autonoma contra
 # Librerias utilizadas 
 - pygame
 - sys
-- math
-- copy
+- numpy
+- pickle
+- random
 
 ¡Uso del  pipinstaller para la creacion del ejecutable!
